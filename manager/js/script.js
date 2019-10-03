@@ -28,6 +28,12 @@ app.config(function($mdThemingProvider, $routeProvider, $locationProvider, $http
 			    controller: 'productsController'
 			}
 		)
+		.when(
+			'/add-product', {
+				templateUrl: 'templates/add-product.html',
+				controller: 'addProductController'
+			}
+		)
 		.otherwise({
 			templateUrl: "templates/orders.html",
 			controller: 'ordersController'
@@ -45,6 +51,12 @@ app.filter("orderStatus", function(STATUSES) {
 	}
 });
 
+app.filter("removeTags", function() {
+	return function(string) {
+		return  string ? String(string).replace(/<[^>]+>/gm, '') : '';
+	}
+})
+
 app.controller('mainController', function($scope, $http, API_URL) {
 	$scope.currentNavItem = 'orders';
 });
@@ -52,9 +64,17 @@ app.controller('mainController', function($scope, $http, API_URL) {
 app.controller('ordersController', function($scope, $http, API_URL, $mdDialog) {
 	$scope.pageName = 'Заказы';
 	$scope.hideProgress = false;
-	$http.get(API_URL + 'orders').then(
-		result => $scope.orders = result.data,
-		error => {
+
+	$scope.getOrders = function() {
+		$http.get(API_URL + 'orders').then(
+			result => {
+				if (result.data.length) {
+					$scope.orders = result.data
+				} else {
+					$scope.hideProgress = true;
+				}
+			},
+			_ => {
 					$scope.hideProgress = true;
 					$mdDialog.show(
 						$mdDialog.alert()
@@ -63,9 +83,48 @@ app.controller('ordersController', function($scope, $http, API_URL, $mdDialog) {
 							.ok('Закрыть')
 					);
 				}
-	);
+		);
+	}
+
+	$scope.deleteOrder = function(orderId) {
+		$http.delete(API_URL + `orders/${orderId}`).then(
+			result => $scope.getOrders(),
+			_ => $mdDialog.show(
+					$mdDialog.alert()
+					.clickOutsideToClose(true)
+					.title('Ошибка удаления заказа')
+					.ok('Закрыть')
+			)
+		);
+	}
 });
 
-app.controller('productsController', function($scope, $http) {
+app.controller('productsController', function($scope, $http, API_URL, $mdDialog) {
 	$scope.pageName = 'Товары';
+	$scope.hideProgress = false;
+	$scope.products = [];
+
+	// TODO: добавить infinite scroll https://sroze.github.io/ngInfiniteScroll/
+	$scope.getProducts = function() {
+		$http.get(API_URL + 'products').then(
+			result => {
+				if (result.data.length) {
+					this.hideProgress = true;
+					$scope.products = result.data;
+				}
+			}
+		);
+	};
+
+	$scope.deleteProduct = function(id) {
+		$http.delete(API_URL + `products/${id}`).then(
+			result => $scope.getProducts(),
+			error => $mdDialog.show(
+						$mdDialog.alert()
+						.clickOutsideToClose(true)
+						.title('Ошибка удаления товара')
+						.ok('Закрыть')
+					)	
+		);
+	}
 });
