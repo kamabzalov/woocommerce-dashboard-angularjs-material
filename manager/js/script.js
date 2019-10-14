@@ -4,7 +4,7 @@ let statuses = new Map();
 // TODO: add another statuses
 statuses.set("processing", "в обработке");
 		
-let app = angular.module('shop', ['ngMaterial', 'ngMessages', 'ngRoute']);
+let app = angular.module('shop', ['ngMaterial', 'ngMessages', 'ngRoute', 'infinite-scroll']);
 app.constant('API_URL', 'https://codetogether.ru/wp-json/wc/v3/');
 app.constant('STATUSES', statuses);
 
@@ -29,9 +29,9 @@ app.config(function($mdThemingProvider, $routeProvider, $locationProvider, $http
 			}
 		)
 		.when(
-			'/add-product', {
-				templateUrl: 'templates/add-product.html',
-				controller: 'addProductController'
+			'/product', {
+				templateUrl: 'templates/product.html',
+				controller: 'productController'
 			}
 		)
 		.otherwise({
@@ -53,7 +53,7 @@ app.filter("orderStatus", function(STATUSES) {
 
 app.filter("removeTags", function() {
 	return function(string) {
-		return  string ? String(string).replace(/<[^>]+>/gm, '') : '';
+		return string ? String(string).replace(/<[^>]+>/gm, '') : '';
 	}
 })
 
@@ -104,17 +104,34 @@ app.controller('productsController', function($scope, $http, API_URL, $mdDialog)
 	$scope.hideProgress = false;
 	$scope.products = [];
 
-	// TODO: добавить infinite scroll https://sroze.github.io/ngInfiniteScroll/
 	$scope.getProducts = function() {
 		$http.get(API_URL + 'products').then(
 			result => {
 				if (result.data.length) {
 					this.hideProgress = true;
 					$scope.products = result.data;
+					if ($scope.products.length > 20) {
+						$scope.getMoreProducts();
+					}
 				}
 			}
 		);
 	};
+
+	$scope.getMoreProducts = function() {
+		let last = $scope.products[$scope.products.length - 1];
+		for(var i = 1; i <= 3; i++) {
+		  $scope.products.push(last + i);
+		}		
+	}
+
+
+  $scope.loadMore = function() {
+    var last = $scope.images[$scope.images.length - 1];
+    for(var i = 1; i <= 8; i++) {
+      $scope.images.push(last + i);
+    }
+  };
 
 	$scope.deleteProduct = function(id) {
 		$http.delete(API_URL + `products/${id}`).then(
@@ -128,3 +145,50 @@ app.controller('productsController', function($scope, $http, API_URL, $mdDialog)
 		);
 	}
 });
+
+app.controller('productController', function($scope, $http, $routeParams, API_URL, $mdDialog) {
+	$scope.productName = '';
+	$scope.productPrice = '';
+	$scope.productDescription = '';
+	$scope.productCategories = [];
+	$scope.categories = [];
+
+	$scope.addProduct = function() {
+		const categories = [];
+		if (!$scope.productCategories.length) {
+			$mdDialog.show(
+				$mdDialog.alert()
+				.clickOutsideToClose(true)
+				.title('Ошибка добавления товара')
+				.ok('Закрыть')
+			);
+			return;	
+		}
+		$scope.productCategories.forEach(id => {
+			categories.push({'id': id});
+		});
+		const newProduct = {
+			name: $scope.productName,
+			type: 'simple',
+			regular_price: $scope.productPrice,
+			description: $scope.productDescription,
+			short_description: $scope.productDescription,
+			categories: categories
+		}
+		$http.post(API_URL + 'products', newProduct).then(
+			res => console.log(res)
+		)
+	}
+
+	$scope.getCategories = function() {
+		$http.get(API_URL + 'products/categories').then(
+			res => {
+				if (res.data.length) {
+					$scope.categories = res.data;
+				}
+			}
+		)
+	}
+
+});
+

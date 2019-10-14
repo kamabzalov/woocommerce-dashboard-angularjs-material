@@ -8,11 +8,10 @@
   <md-progress-circular md-mode="indeterminate"></md-progress-circular>
 </div>
 
-<div ng-init="getProducts()">
-  <div layout="row" layout-wrap="" ng-if="products.length">
+  <div layout="row" layout-wrap="" ng-if="products.length" infinite-scroll="getProducts()" infinite-scroll-distance="2">
     <div flex=30 ng-repeat="product in products">
         <md-card>
-            <img ng-src="{{product.images[0].src}}" class="md-card-image" alt="Washed Out">
+            <img ng-src="{{product.images[0].src}}" class="md-card-image">
             <md-card-title>
               <md-card-title-text>
                   <span class="md-headline">{{product.name}}</span>
@@ -28,4 +27,3 @@
           </md-card>
     </div>  
   </div>  
-</div>
