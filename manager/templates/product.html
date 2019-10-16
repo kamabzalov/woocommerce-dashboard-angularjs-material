@@ -1,0 +1,28 @@
+<div layout="row" layout-padding ng-cloak>
+        {{productCategories.length}}
+    <div flex>
+        <form name="colorForm" ng-submit="addProduct()">
+            <md-input-container class="md-block">
+              <label>Название товара</label>
+              <input name="productName" ng-model="productName" required>
+            </md-input-container>
+            <md-input-container class="md-block">
+                <label>Цена товара</label>
+                <input name="productPrice" ng-model="productPrice" required>
+            </md-input-container>
+            <md-input-container class="md-block">
+                <label>Описание</label>
+                <textarea name="productDescription" ng-model="productDescription"></textarea>
+            </md-input-container>
+            <md-input-container class="md-block">
+                <label>Категория товара</label>
+                <md-select ng-model="productCategories" multiple>
+                    <md-option ng-repeat="category in categories" ng-value="category.id">
+                    
+                    </md-option>
+                </md-select>
+            </md-input-container>
+            <md-button type="submit" class="md-raised md-primary">Добавить</md-button>
+          </form>
+    </div>
+</div>

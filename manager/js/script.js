@@ -1,19 +1,20 @@
 'use strict'
 
-let statuses = new Map();
 // TODO: add another statuses
+let statuses = new Map();
 statuses.set("processing", "в обработке");
 		
-let app = angular.module('shop', ['ngMaterial', 'ngMessages', 'ngRoute', 'infinite-scroll']);
+let app = angular.module('shop', ['ngMaterial', 'ngMessages', 'ngRoute']);
 app.constant('API_URL', 'https://codetogether.ru/wp-json/wc/v3/');
 app.constant('STATUSES', statuses);
+app.constant('DUMMY_IMAGE', 'https://via.placeholder.com/460/460');
 
 app.config(function($httpProvider) {
 	let auth = window.btoa('ck_000e1f9b7fd5200992a3fdb46f982c495ac721f8:cs_93ff2e592ee90b6c54d45abe78277b0992684979');
 	$httpProvider.defaults.headers.common.Authorization = 'Basic ' + auth;
 });
 
-app.config(function($mdThemingProvider, $routeProvider, $locationProvider, $httpProvider){
+app.config(function($mdThemingProvider, $routeProvider, $locationProvider){
 	$mdThemingProvider.theme('primary').primaryPalette('blue').accentPalette('orange');
 	$routeProvider
 		.when(
@@ -30,6 +31,12 @@ app.config(function($mdThemingProvider, $routeProvider, $locationProvider, $http
 		)
 		.when(
 			'/product', {
+				templateUrl: 'templates/product.html',
+				controller: 'productController'
+			}
+		)
+		.when(
+			'/product/:id', {
 				templateUrl: 'templates/product.html',
 				controller: 'productController'
 			}
@@ -99,39 +106,20 @@ app.controller('ordersController', function($scope, $http, API_URL, $mdDialog) {
 	}
 });
 
-app.controller('productsController', function($scope, $http, API_URL, $mdDialog) {
+app.controller('productsController', function($scope, $http, API_URL, DUMMY_IMAGE, $mdDialog) {
 	$scope.pageName = 'Товары';
 	$scope.hideProgress = false;
 	$scope.products = [];
+	$scope.dummyImage = DUMMY_IMAGE;
 
 	$scope.getProducts = function() {
-		$http.get(API_URL + 'products').then(
-			result => {
-				if (result.data.length) {
-					this.hideProgress = true;
+			$http.get(API_URL + 'products').then(
+				result => {
 					$scope.products = result.data;
-					if ($scope.products.length > 20) {
-						$scope.getMoreProducts();
-					}
+					$scope.hideProgress = true;
 				}
-			}
-		);
+			);
 	};
-
-	$scope.getMoreProducts = function() {
-		let last = $scope.products[$scope.products.length - 1];
-		for(var i = 1; i <= 3; i++) {
-		  $scope.products.push(last + i);
-		}		
-	}
-
-
-  $scope.loadMore = function() {
-    var last = $scope.images[$scope.images.length - 1];
-    for(var i = 1; i <= 8; i++) {
-      $scope.images.push(last + i);
-    }
-  };
 
 	$scope.deleteProduct = function(id) {
 		$http.delete(API_URL + `products/${id}`).then(
@@ -146,12 +134,33 @@ app.controller('productsController', function($scope, $http, API_URL, $mdDialog)
 	}
 });
 
-app.controller('productController', function($scope, $http, $routeParams, API_URL, $mdDialog) {
+app.controller('productController', function($scope, $http, $routeParams, API_URL, $mdDialog, $filter, $location) {
 	$scope.productName = '';
 	$scope.productPrice = '';
 	$scope.productDescription = '';
 	$scope.productCategories = [];
 	$scope.categories = [];
+	if ($routeParams.id) {
+		let productId = +$routeParams.id;
+		$http.get(API_URL + `products/${productId}`).then(
+			product => {
+				$scope.productName = product.data.name;
+				$scope.productPrice = product.data.price;
+				$scope.productDescription = $filter('removeTags')(product.data.description);
+				product.data.categories.forEach(category => {
+					$scope.productCategories.push(category.id);
+				})
+			},
+			error => {
+				$mdDialog.show(
+					$mdDialog.alert()
+					.clickOutsideToClose(true)
+					.title('Ошибка. Товар не найден')
+					.ok('Закрыть')
+				);
+			}
+		)
+	}
 
 	$scope.addProduct = function() {
 		const categories = [];
@@ -176,7 +185,17 @@ app.controller('productController', function($scope, $http, $routeParams, API_UR
 			categories: categories
 		}
 		$http.post(API_URL + 'products', newProduct).then(
-			res => console.log(res)
+			res => {
+				if (res) {
+					$mdDialog.show(
+						$mdDialog.alert()
+						.clickOutsideToClose(true)
+						.title('Успех')
+						.ok('Закрыть')
+					);
+					$location.url('/products');
+				}
+			}
 		)
 	}
 

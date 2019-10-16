@@ -8,10 +8,11 @@
   <md-progress-circular md-mode="indeterminate"></md-progress-circular>
 </div>
 
-  <div layout="row" layout-wrap="" ng-if="products.length" infinite-scroll="getProducts()" infinite-scroll-distance="2">
+  <div layout="row" layout-wrap ng-init="getProducts()">
     <div flex=30 ng-repeat="product in products">
         <md-card>
-            <img ng-src="{{product.images[0].src}}" class="md-card-image">
+            <img ng-if="product.images[0].src" ng-src="{{product.images[0].src}}" class="md-card-image">
+            <img ng-if="!product.images[0].src" ng-src="{{dummyImage}}" class="md-card-image">
             <md-card-title>
               <md-card-title-text>
                   <span class="md-headline">{{product.name}}</span>
@@ -20,6 +21,7 @@
             </md-card-title>
             <md-card-actions layout="row" layout-align="start center">
                 <md-button ng-click="deleteProduct(product.id)">Удалить товар</md-button>
+                <md-button ng-href="product/{{product.id}}">Изменить товар</md-button>
               </md-card-actions>
             <md-card-content>
               {{product.short_description | removeTags}}
