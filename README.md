@@ -1,6 +1,6 @@
 # Simple woocommerce api dashboard with AngularJS Material
 
-## Projects methods:
+## Project methods:
 
  - getOrders() - gets orders list
  - getProducts() - gets products list
