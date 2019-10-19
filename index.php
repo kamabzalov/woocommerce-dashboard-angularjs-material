@@ -2,6 +2,7 @@
 
 require('../wp-load.php');
 $error = null;
+session_start();
 
 if(!empty($_POST)) {
 	$creds = array();
@@ -13,6 +14,7 @@ if(!empty($_POST)) {
 		$error = 'Неверный логин или пароль';
 	
 	} else {
+		$_SESSION['user'] = $creds['user_login'];
 		header('Location: manager');
 		$error = null;
 	}

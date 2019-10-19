@@ -1,6 +1,5 @@
 <div layout="row" layout-padding ng-cloak>
-        {{productCategories.length}}
-    <div flex>
+    <div flex ng-init="getCategories()">
         <form name="colorForm" ng-submit="addProduct()">
             <md-input-container class="md-block">
               <label>Название товара</label>
@@ -18,7 +17,7 @@
                 <label>Категория товара</label>
                 <md-select ng-model="productCategories" multiple>
                     <md-option ng-repeat="category in categories" ng-value="category.id">
-                    
+                    {{category.name}}
                     </md-option>
                 </md-select>
             </md-input-container>

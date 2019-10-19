@@ -18,12 +18,6 @@ app.config(function($mdThemingProvider, $routeProvider, $locationProvider){
 	$mdThemingProvider.theme('primary').primaryPalette('blue').accentPalette('orange');
 	$routeProvider
 		.when(
-			'/orders', {
-				templateUrl: 'templates/orders.html',
-				controller: 'ordersController'
-			}
-		)
-		.when(
 			'/products', {
 				templateUrl: 'templates/products.html',
 			    controller: 'productsController'
@@ -42,10 +36,12 @@ app.config(function($mdThemingProvider, $routeProvider, $locationProvider){
 			}
 		)
 		.otherwise({
-			templateUrl: "templates/orders.html",
+			templateUrl: 'templates/orders.html',
 			controller: 'ordersController'
         }) 
-	$locationProvider.html5Mode(true);
+		$locationProvider.html5Mode({
+			enabled: true
+		});
 });
 
 app.filter("orderStatus", function(STATUSES) {
@@ -64,8 +60,8 @@ app.filter("removeTags", function() {
 	}
 })
 
-app.controller('mainController', function($scope, $http, API_URL) {
-	$scope.currentNavItem = 'orders';
+app.controller('mainController', function($scope, $http, $location, API_URL) {
+	$scope.currentNavItem = $location.path().split('/')[1];
 });
 
 app.controller('ordersController', function($scope, $http, API_URL, $mdDialog) {
@@ -113,7 +109,7 @@ app.controller('productsController', function($scope, $http, API_URL, DUMMY_IMAG
 	$scope.dummyImage = DUMMY_IMAGE;
 
 	$scope.getProducts = function() {
-			$http.get(API_URL + 'products').then(
+			$http.get(API_URL + 'products?per_page=100').then(
 				result => {
 					$scope.products = result.data;
 					$scope.hideProgress = true;

@@ -1,9 +1,16 @@
+<?php
+session_start();
+if (!$_SESSION['user']) {
+	header('Location: /');
+	exit();
+}
+?>
 <!DOCTYPE html>
 <html data-ng-app="shop">
 <head>
 	<meta charset="UTF-8">
+	<base href="/manager/"/>
 	<title>Управление магазином</title>
-	<base href="/manager/">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
 	<link rel="stylesheet" href="css/angular-material.min.css">
 	<link rel="stylesheet" href="css/style.css">
