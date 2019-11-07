@@ -3,7 +3,8 @@
 ## Project methods:
 
  - getOrders() - gets orders list
- - getProducts() - gets products list
  - deleteOrder(orderId) - remove order by ID
+ - getProducts() - gets products list for infinite scroll
  - deleteProduct(productId) - remove product by ID
- - addNewProduct() - add new product
+ - addProduct() - add new product
+ - getCategories() - get categories list

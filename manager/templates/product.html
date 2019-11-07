@@ -2,8 +2,8 @@
     <div flex ng-init="getCategories()">
         <form name="colorForm" ng-submit="addProduct()">
             <md-input-container class="md-block">
-              <label>Название товара</label>
-              <input name="productName" ng-model="productName" required>
+                <label>Название товара</label>
+                <input name="productName" ng-model="productName" required>
             </md-input-container>
             <md-input-container class="md-block">
                 <label>Цена товара</label>
@@ -17,11 +17,11 @@
                 <label>Категория товара</label>
                 <md-select ng-model="productCategories" multiple>
                     <md-option ng-repeat="category in categories" ng-value="category.id">
-                    {{category.name}}
+                        {{category.name}}
                     </md-option>
                 </md-select>
             </md-input-container>
             <md-button type="submit" class="md-raised md-primary">Добавить</md-button>
-          </form>
+        </form>
     </div>
 </div>
