@@ -105,7 +105,6 @@ app.controller('ordersController', function ($scope, $http, API_URL, $mdDialog) 
 app.controller('productsController', function ($scope, $http, API_URL, DUMMY_IMAGE, $mdDialog) {
     $scope.pageName = 'Товары';
     $scope.hideProgress = false;
-    $scope.products = [];
     $scope.dummyImage = DUMMY_IMAGE;
     $scope.page = 0;
     $scope.disabled = false;
@@ -114,6 +113,7 @@ app.controller('productsController', function ($scope, $http, API_URL, DUMMY_IMA
         $scope.page++;
         $http.get(API_URL + `products?page=${$scope.page}`).then(
             result => {
+                    $scope.products = [];
                 if (result.data.length > 0) {
                     result.data.forEach(item => $scope.products.push(item));
                     $scope.hideProgress = true;
@@ -124,11 +124,9 @@ app.controller('productsController', function ($scope, $http, API_URL, DUMMY_IMA
         );
     };
 
-    $scope.getProducts();
-
     $scope.deleteProduct = function (id) {
         $http.delete(API_URL + `products/${id}`).then(
-            result => this.products = result.data,
+            result => $scope.getProducts(),
             _ => $mdDialog.show(
                 $mdDialog.alert()
                     .clickOutsideToClose(true)
