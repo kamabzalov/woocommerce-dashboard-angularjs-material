@@ -6,5 +6,5 @@
  - deleteOrder(orderId) - remove order by ID
  - getProducts() - gets products list for infinite scroll
  - deleteProduct(productId) - remove product by ID
- - addProduct() - add new product
+ - saveProduct() - add new product
  - getCategories() - get categories list
