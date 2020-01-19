@@ -8,7 +8,7 @@
     <md-progress-circular md-mode="indeterminate"></md-progress-circular>
 </div>
 
-<div layout="row" layout-wrap ng-init="getProducts()">
+<div layout="row" layout-wrap data-ng-init="getProducts()">
     <div flex=30 ng-repeat="product in products">
         <md-card>
             <img ng-if="product.images[0].src" ng-src="{{product.images[0].src}}" class="md-card-image">
@@ -29,3 +29,5 @@
         </md-card>
     </div>
 </div>
+
+<md-button data-ng-if="!disabled" class="md-raised md-warn fixed-button" data-ng-click="getProducts()">Загрузить больше товаров</md-button>
